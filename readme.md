@@ -30,7 +30,7 @@ If using Docker, ensure that the PostgreSQL container is running.
 ### Project Setup
 
 ```bash
-git clone https://github.com/your-username/url-shortener.git
+git clone https://github.com/i-am-sushant/url-shortener-springboot.git
 ```
 
 ```bash
