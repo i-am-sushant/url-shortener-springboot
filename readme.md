@@ -34,7 +34,7 @@ git clone https://github.com/i-am-sushant/url-shortener-springboot.git
 ```
 
 ```bash
-cd url-shortener
+cd url-shortener-springboot
 ```
 
 Run PostgreSQL in Docker (if PostgreSQL is not installed locally):
