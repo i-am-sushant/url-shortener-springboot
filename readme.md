@@ -102,9 +102,6 @@ The tests are configured to use the in-memory H2 database, which is set up in th
 http://localhost:8080/swagger-ui/index.html
 ```
 
-### Contributor
-[Muhire Josué](https://github.com/Muhire-Josue)
-
 ### Folder structure:
 
 ```text
