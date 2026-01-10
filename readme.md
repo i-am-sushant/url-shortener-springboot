@@ -107,45 +107,60 @@ http://localhost:8080/swagger-ui/index.html
 
 ### Folder structure:
 
-```json
-src
- ├── main
- │    ├── java
- │    │    └── com.url.shortener
- │    │          ├── controller
- │    │          │    └── UrlController.java
- │    │          ├── dto
- │    │          │    ├── CreateShortUrlDto.java
- │    │          │    └── http
- │    │          │          ├── CreateShortUrlResponseDto.java
- │    │          │          └── DeleteShortUrlResponseDto.java
- │    │          ├── entity
- │    │          │    └── Url.java
- │    │          ├── exception
- │    │          │    ├── BadRequestException.java
- │    │          │    ├── GlobalExceptionHandler.java
- │    │          │    └── ResourceNotFoundException.java
- │    │          ├── repository
- │    │          │    └── UrlRepository.java
- │    │          ├── scheduler
- │    │          │    └── UrlCleanupScheduler.java
- │    │          ├── service
- │    │          │    ├── IUrlService.java
- │    │          │    └── UrlServiceImpl.java
- │    │          ├── transfomer
- │    │          │    └── UrlTransformer.java
- │    │          ├── util
- │    │          │    └── CodeGenerator.java
- │    │          └── validator
- │    │                └── UrlIdValidator.java
- │    └── resources
- │          ├── application.yml
- │          └── db/migration
- │                └── V1__Initial.sql
- └── test
-      ├── java
-      │    └── com.url.shortener
-      │          └── UrlControllerIntegrationTest.java
-      └── resources
-            └── application-test.yml
+```text
+.
+├── docker-compose.yml
+├── Dockerfile
+├── pom.xml
+└── src
+      ├── main
+      │   ├── java
+      │   │   └── com
+      │   │       └── url
+      │   │           └── shortener
+      │   │               ├── ShortenerApplication.java
+      │   │               ├── config
+      │   │               │   └── SwaggerConfig.java
+      │   │               ├── controller
+      │   │               │   └── UrlController.java
+      │   │               ├── dto
+      │   │               │   ├── CreateShortUrlDto.java
+      │   │               │   └── http
+      │   │               │       ├── CreateShortUrlResponseDto.java
+      │   │               │       ├── DeleteShortUrlResponseDto.java
+      │   │               │       └── ErrorResponseDto.java
+      │   │               ├── entity
+      │   │               │   └── Url.java
+      │   │               ├── exception
+      │   │               │   ├── BadRequestException.java
+      │   │               │   ├── DataConflictException.java
+      │   │               │   ├── GlobalExceptionHandler.java
+      │   │               │   └── ResourceNotFoundException.java
+      │   │               ├── repository
+      │   │               │   └── UrlRepository.java
+      │   │               ├── scheduler
+      │   │               │   └── UrlCleanupScheduler.java
+      │   │               ├── service
+      │   │               │   ├── IUrlService.java
+      │   │               │   └── UrlServiceImpl.java
+      │   │               ├── transfomer
+      │   │               │   └── UrlTransformer.java
+      │   │               ├── util
+      │   │               │   └── CodeGenerator.java
+      │   │               └── validator
+      │   │                   └── UrlIdValidator.java
+      │   └── resources
+      │       ├── application.yml
+      │       ├── application-test.yml
+      │       └── db
+      │           └── migration
+      │               ├── V1__create_urls_table.sql
+      │               └── V2__add_unique_constraint_and_indexes.sql
+      └── test
+            └── java
+                  └── com
+                        └── url
+                              └── shortener
+                                    ├── ShortenerApplicationTests.java
+                                    └── UrlControllerIntegrationTest.java
 ```
