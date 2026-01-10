@@ -10,10 +10,11 @@ To run this project locally, you need to have the following tools installed:
 
 - **Java 17** or higher
 - **Maven 3.6+**
-- **Docker** (for running the PostgreSQL database)
-- **PostgreSQL** (if not using Docker)
+- **Docker** (recommended: run app + Postgres via Compose)
 
-If using Docker, ensure that the PostgreSQL container is running.
+Note: This project targets Java 21 (see `pom.xml`).
+
+If using Docker Compose, it will start PostgreSQL for you.
 
 ## Endpoints
 
@@ -40,8 +41,40 @@ cd url-shortener-springboot
 Run PostgreSQL in Docker (if PostgreSQL is not installed locally):
 
 ```bash
-docker run --name pg-url-shortener -e POSTGRES_USER=admin -e POSTGRES_PASSWORD=root -e POSTGRES_DB=shortener_db -p 5432:5432 -d postgres
+docker compose up --build
 ```
+
+The API will be available at http://localhost:8080.
+
+Swagger UI:
+
+```bash
+http://localhost:8080/swagger-ui/index.html
+```
+
+To stop:
+
+```bash
+docker compose down
+```
+
+### Database persistence (Docker)
+
+This project uses a named Docker volume for PostgreSQL data, so the database **persists across restarts**.
+
+- Stop containers (keeps DB data):
+
+```bash
+docker compose down
+```
+
+- Stop containers **and wipe DB data** (fresh database next start):
+
+```bash
+docker compose down -v
+```
+
+Note: By default PostgreSQL is not published to `localhost:5432` (to avoid port conflicts). The API still connects to the DB over the Docker network.
 
 ### Build and run the project:
 
@@ -66,7 +99,7 @@ The tests are configured to use the in-memory H2 database, which is set up in th
 ### How to Access swagger documentation:
 
 ```bash
-http://localhost:8080/swagger-ui.html
+http://localhost:8080/swagger-ui/index.html
 ```
 
 ### Contributor
