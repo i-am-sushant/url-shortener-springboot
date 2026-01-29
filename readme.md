@@ -1,163 +1,272 @@
-# URL Shortener Service
+# 🔗 URL Shortener Service
 
-## Project Description
+A production-ready **URL Shortener microservice** built with Spring Boot 3.3.4 and Java 21. This service allows users to create short URLs, redirect to original URLs, and manage URL lifecycle with optional TTL (time-to-live) expiration.
 
-The **URL Shortener Service** is a Spring Boot-based application that allows users to shorten long URLs. It provides endpoints to create short URLs, redirect to the original URLs using the short IDs, and delete the shortened URLs. The service supports setting a custom short URL ID, along with an optional time-to-live (TTL) for the shortened URL. If no TTL is specified, the URL will persist indefinitely. The project uses a PostgreSQL database in production and H2 in-memory database for testing.
+---
 
-## Prerequisites
+## ✨ Features
 
-To run this project locally, you need to have the following tools installed:
+- **Create Short URLs** - Generate 6-character alphanumeric short codes (62^6 = 56+ billion combinations)
+- **Custom Short Codes** - Optionally provide your own short URL ID
+- **TTL Support** - Set expiration time in seconds; URLs without TTL persist indefinitely
+- **Auto-Cleanup** - Background scheduler removes expired URLs automatically
+- **RESTful API** - Clean API design with proper HTTP status codes
+- **Swagger Documentation** - Interactive API documentation via OpenAPI 3.0
+- **Docker Ready** - Multi-stage Docker build with Docker Compose orchestration
+- **Database Migrations** - Versioned schema with Flyway
+- **Comprehensive Testing** - Integration tests with H2 in-memory database
 
-- **Java 17** or higher
+---
+
+## 🛠️ Tech Stack
+
+| Technology | Purpose |
+|------------|---------|
+| **Java 21** | Programming language |
+| **Spring Boot 3.3.4** | Application framework |
+| **Spring Data JPA** | Database ORM |
+| **PostgreSQL** | Production database |
+| **H2 Database** | Testing database |
+| **Flyway** | Database migrations |
+| **Lombok** | Boilerplate reduction |
+| **SpringDoc OpenAPI** | Swagger UI documentation |
+| **Docker & Docker Compose** | Containerization |
+| **Maven** | Build tool |
+
+---
+
+## 📋 Prerequisites
+
+- **Java 21** or higher
 - **Maven 3.6+**
-- **Docker** (recommended: run app + Postgres via Compose)
+- **Docker & Docker Compose** (recommended)
 
-Note: This project targets Java 21 (see `pom.xml`).
+---
 
-If using Docker Compose, it will start PostgreSQL for you.
+## 🚀 Quick Start
 
-## Endpoints
-
-| HTTP Method | Endpoint              | Description                                    | Request Body Example |
-|-------------|-----------------------|------------------------------------------------|----------------------|
-| `POST`      | `/api/v1/create`       | Creates a new shortened URL                    | `{ "originalUrl": "https://www.example.com", "urlId": "abc123", "ttl": 3600 }` |
-| `GET`       | `/api/v1/{urlId}`      | Redirects to the original URL using the short ID | N/A |
-| `DELETE`    | `/api/v1/delete/{urlId}`| Deletes a shortened URL by its ID              | N/A |
-
-### Request Parameters
-
-- **urlId**: Shortened URL ID (Alphanumeric, 6 characters).
-
-### Project Setup
+### Option 1: Docker Compose (Recommended)
 
 ```bash
+# Clone the repository
 git clone https://github.com/i-am-sushant/url-shortener-springboot.git
-```
-
-```bash
 cd url-shortener-springboot
-```
 
-Run PostgreSQL in Docker (if PostgreSQL is not installed locally):
-
-```bash
+# Start the application with PostgreSQL
 docker compose up --build
+
+# The API is available at http://localhost:8080
+# Swagger UI: http://localhost:8080/swagger-ui/index.html
 ```
 
-The API will be available at http://localhost:8080.
-
-Swagger UI:
+### Option 2: Local Development
 
 ```bash
-http://localhost:8080/swagger-ui/index.html
-```
+# Ensure PostgreSQL is running locally on port 5432
+# Database: shortener_db, User: postgres, Password: root
 
-To stop:
-
-```bash
-docker compose down
-```
-
-### Database persistence (Docker)
-
-This project uses a named Docker volume for PostgreSQL data, so the database **persists across restarts**.
-
-- Stop containers (keeps DB data):
-
-```bash
-docker compose down
-```
-
-- Stop containers **and wipe DB data** (fresh database next start):
-
-```bash
-docker compose down -v
-```
-
-Note: By default PostgreSQL is not published to `localhost:5432` (to avoid port conflicts). The API still connects to the DB over the Docker network.
-
-### Build and run the project:
-
-```bash
+# Build and run
 mvn clean install
-```
-
-```bash
 mvn spring-boot:run
 ```
 
-The application will run on http://localhost:8080.
+---
 
-### How to Run Tests:
+## 📡 API Endpoints
+
+| Method | Endpoint | Description | Request Body |
+|--------|----------|-------------|--------------|
+| `POST` | `/api/v1/create` | Create a shortened URL | JSON (see below) |
+| `GET` | `/api/v1/{urlId}` | Redirect to original URL | - |
+| `DELETE` | `/api/v1/delete/{urlId}` | Delete a shortened URL | - |
+
+### Create Short URL Request
+
+```json
+{
+  "originalUrl": "https://www.example.com",
+  "urlId": "abc123",    // Optional: 6 alphanumeric characters
+  "ttl": 3600           // Optional: Time-to-live in seconds
+}
+```
+
+### Response Examples
+
+**Success (201 Created):**
+```json
+{
+  "id": 1,
+  "originalUrl": "https://www.example.com",
+  "ttl": 3600,
+  "urlId": "abc123"
+}
+```
+
+**Error (409 Conflict):**
+```json
+{
+  "statusCode": 409,
+  "errorMessage": "URL ID Already exist."
+}
+```
+
+---
+
+## 🗄️ Database Persistence
+
+This project uses a named Docker volume for PostgreSQL data.
+
+```bash
+# Stop containers (keeps database data)
+docker compose down
+
+# Stop containers AND wipe database (fresh start)
+docker compose down -v
+```
+
+> **Note:** PostgreSQL is not exposed to localhost:5432 by default to avoid port conflicts. The API connects via the Docker network.
+
+---
+
+## 🧪 Running Tests
 
 ```bash
 mvn test
 ```
-The tests are configured to use the in-memory H2 database, which is set up in the application-test.yml file.
 
+Tests use the **H2 in-memory database** configured in `application-test.yml` with Flyway disabled.
 
-### How to Access swagger documentation:
+---
 
-```bash
+## 📖 Swagger Documentation
+
+Access interactive API documentation at:
+
+```
 http://localhost:8080/swagger-ui/index.html
 ```
 
-### Folder structure:
-
-```text
-.
-├── docker-compose.yml
-├── Dockerfile
-├── pom.xml
-└── src
-      ├── main
-      │   ├── java
-      │   │   └── com
-      │   │       └── url
-      │   │           └── shortener
-      │   │               ├── ShortenerApplication.java
-      │   │               ├── config
-      │   │               │   └── SwaggerConfig.java
-      │   │               ├── controller
-      │   │               │   └── UrlController.java
-      │   │               ├── dto
-      │   │               │   ├── CreateShortUrlDto.java
-      │   │               │   └── http
-      │   │               │       ├── CreateShortUrlResponseDto.java
-      │   │               │       ├── DeleteShortUrlResponseDto.java
-      │   │               │       └── ErrorResponseDto.java
-      │   │               ├── entity
-      │   │               │   └── Url.java
-      │   │               ├── exception
-      │   │               │   ├── BadRequestException.java
-      │   │               │   ├── DataConflictException.java
-      │   │               │   ├── GlobalExceptionHandler.java
-      │   │               │   └── ResourceNotFoundException.java
-      │   │               ├── repository
-      │   │               │   └── UrlRepository.java
-      │   │               ├── scheduler
-      │   │               │   └── UrlCleanupScheduler.java
-      │   │               ├── service
-      │   │               │   ├── IUrlService.java
-      │   │               │   └── UrlServiceImpl.java
-      │   │               ├── transfomer
-      │   │               │   └── UrlTransformer.java
-      │   │               ├── util
-      │   │               │   └── CodeGenerator.java
-      │   │               └── validator
-      │   │                   └── UrlIdValidator.java
-      │   └── resources
-      │       ├── application.yml
-      │       ├── application-test.yml
-      │       └── db
-      │           └── migration
-      │               ├── V1__create_urls_table.sql
-      │               └── V2__add_unique_constraint_and_indexes.sql
-      └── test
-            └── java
-                  └── com
-                        └── url
-                              └── shortener
-                                    ├── ShortenerApplicationTests.java
-                                    └── UrlControllerIntegrationTest.java
 ```
+http://localhost:8080/swagger-ui/index.html
+```
+
+---
+
+## 🏗️ Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                     CONTROLLER LAYER                            │
+│                     (UrlController.java)                        │
+│   • Handles HTTP requests (POST, GET, DELETE)                   │
+│   • Input validation using @Valid                               │
+└─────────────────────────────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                      SERVICE LAYER                              │
+│                    (UrlServiceImpl.java)                        │
+│   • Business logic & short code generation                      │
+└─────────────────────────────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    REPOSITORY LAYER                             │
+│                    (UrlRepository.java)                         │
+│   • Spring Data JPA repository                                  │
+└─────────────────────────────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                   DATABASE (PostgreSQL)                         │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 📁 Project Structure
+
+```
+.
+├── docker-compose.yml          # Docker orchestration
+├── Dockerfile                  # Multi-stage Docker build
+├── pom.xml                     # Maven dependencies
+└── src
+    ├── main
+    │   ├── java/com/url/shortener
+    │   │   ├── ShortenerApplication.java    # Main application class
+    │   │   ├── config/
+    │   │   │   └── SwaggerConfig.java       # OpenAPI configuration
+    │   │   ├── controller/
+    │   │   │   └── UrlController.java       # REST endpoints
+    │   │   ├── dto/
+    │   │   │   ├── CreateShortUrlDto.java   # Request DTO
+    │   │   │   └── http/                    # Response DTOs
+    │   │   ├── entity/
+    │   │   │   └── Url.java                 # JPA entity
+    │   │   ├── exception/
+    │   │   │   ├── GlobalExceptionHandler.java
+    │   │   │   ├── BadRequestException.java
+    │   │   │   ├── DataConflictException.java
+    │   │   │   └── ResourceNotFoundException.java
+    │   │   ├── repository/
+    │   │   │   └── UrlRepository.java       # Data access layer
+    │   │   ├── scheduler/
+    │   │   │   └── UrlCleanupScheduler.java # TTL cleanup job
+    │   │   ├── service/
+    │   │   │   ├── IUrlService.java         # Service interface
+    │   │   │   └── UrlServiceImpl.java      # Business logic
+    │   │   ├── transformer/
+    │   │   │   └── UrlTransformer.java      # DTO-Entity mapper
+    │   │   ├── util/
+    │   │   │   └── CodeGenerator.java       # Short code generator
+    │   │   └── validator/
+    │   │       └── UrlIdValidator.java      # Custom validation
+    │   └── resources/
+    │       ├── application.yml              # Production config
+    │       ├── application-test.yml         # Test config
+    │       └── db/migration/                # Flyway migrations
+    └── test/
+        └── java/com/url/shortener/          # Integration tests
+```
+
+---
+
+## ⚙️ Configuration
+
+### Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `SERVER_PORT` | 8080 | Application port |
+| `SPRING_DATASOURCE_URL` | jdbc:postgresql://localhost:5432/shortener_db | Database URL |
+| `SPRING_DATASOURCE_USERNAME` | postgres | Database username |
+| `SPRING_DATASOURCE_PASSWORD` | root | Database password |
+| `SCHEDULER_CLEANUP_INTERVAL_MS` | 60000 | Expired URL cleanup interval (ms) |
+
+---
+
+## 🔑 Key Design Decisions
+
+| Decision | Rationale |
+|----------|-----------|
+| **6-character alphanumeric codes** | Provides 56B+ combinations; short and human-readable |
+| **Optional TTL with null = forever** | Flexible; users choose URL persistence |
+| **Background scheduler for cleanup** | Efficient; avoids checking expiry on every request |
+| **Flyway for migrations** | Production-safe, versioned schema changes |
+| **Interface + Implementation pattern** | Enables mocking and future implementations |
+| **Multi-stage Docker build** | Smaller final image; separates build from runtime |
+
+---
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 👤 Author
+
+**Sushant**
+
+- GitHub: [@i-am-sushant](https://github.com/i-am-sushant)
